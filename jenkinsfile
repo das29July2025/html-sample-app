@@ -6,6 +6,7 @@ pipeline {
         REPO_NAME  = 'https://github.com/das29July2025/html-sample-app.git'
         BRANCH_NAME = 'master'
         SONAR_TOKEN  = credentials('DAS-SONARQUEBE-SECRETKEY')
+        DOCKER_CREDS = 'das-dockercredential'
         SONAR_PROJECT_KEY =  'DAS-SONARQUBE-JENKINFILES '
         SONAR_SERVER_NAME = 'DAS-SONARQUBE' // name we have configured under jenkins global confir
     }
@@ -76,7 +77,27 @@ pipeline {
                 
             
         }
+      // pushing image  to dockerhub 
+        stage('Docker hub image push'){
+            steps{
+                echo 'pushing image to docker hub'
+                script {
+                    def imageName  = "das-dockercredential/daswebapp-iis-ltsc2022"
+                    def imageTag   = "codev30"
+                    def hubCred   = "${DOCKER_CREDS}"
+                    // calling jenkins pluing docker pipeline to push
+                    docker.withRegistry('https://registry.hub.docker.com',hubCred){
+                        docker.image(imageName + ":" + imageTag).push()
+                        // 
+
+                    }
+
+                }
+            }
+        }
      
     }
 }
+    
+
     

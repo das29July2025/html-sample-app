@@ -29,7 +29,7 @@ pipeline {
                 git url: "${REPO_NAME}", branch: "${BRANCH_NAME}"
             }
         }
-     //SONARQUEBE SCAN
+     //SONARQUEBE SCAN1
      stage('SAST with sonar-scanner'){
         steps {
             echo 'wait for sonar-scanner to comoplete'

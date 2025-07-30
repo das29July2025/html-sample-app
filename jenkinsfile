@@ -2,7 +2,7 @@ pipeline {
     agent any // selection of agents 
     // defining environment variables 
     environment {
-        SONAR_HOME = 'C:\\Users\\Administrator\\Documents\\tools\\sonar-scanner\\bin'
+        SONAR_HOME = 'C:\\Users\\Administrator\\Documents\\Tools\\Sonarscanner\\bin'
         REPO_NAME  = 'https://github.com/das29July2025/html-sample-app.git'
         BRANCH_NAME = 'master'
     }

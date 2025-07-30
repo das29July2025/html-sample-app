@@ -4,7 +4,7 @@ pipeline {
     environment {
         SONAR_HOME = 'C:\\Users\\Administrator\\Documents\\tools\\sonar-scanner\\bin'
         REPO_NAME  = 'https://github.com/das29July2025/html-sample-app.git'
-        BRANCH_NAME = 'main'
+        BRANCH_NAME = 'master'
     }
 
     stages {

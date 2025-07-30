@@ -58,5 +58,25 @@ pipeline {
             
         }
      
+
+      // using docker plugin to build container image 
+        stage('building docker image'){
+            steps {
+                echo 'starting docker build process'
+                // to use docker plugin using script 
+                script {
+                    def imageName  = "daswebapp-iis-ltsc2022"
+                    def imageTag   = "codev30"
+                    docker.build("${imageName}:${imageTag}",".")
+
+                }
+                // verify image build 
+                bat 'docker images   | findstr daswebapp'
+            }
+                
+            
+        }
+     
     }
 }
+    

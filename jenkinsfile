@@ -6,6 +6,8 @@ pipeline {
         REPO_NAME  = 'https://github.com/das29July2025/html-sample-app.git'
         BRANCH_NAME = 'master'
         SONAR_TOKEN  = credentials('DAS-SONARQUEBE-SECRETKEY')
+        SONAR_PROJECT_KEY =  'DAS-SONARQUBE-JENKINFILES '
+        SONAR_SERVER_NAME = 'DAS-SONARQUEBE-SECRETKEY' // name we have configured under jenkins global confir
     }
 
     stages {
@@ -33,17 +35,27 @@ pipeline {
             }
         }
         // doing sast with sonar-qube 
-        stage('SAST with Sonerscanner'){
+        stage('SAST with sonar-scanner'){
             steps {
-                echo 'wait for Sonerscanner to finish'
-                bat """
-                 %SONAR_HOME%\\sonar-scanner \
-                -Dsonar.projectKey=DAS-SONARQUBE-JENKINFILES \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=http://13.203.151.240:9000 \
-                -Dsonar.token=${SONAR_TOKEN}
-                """
+                 echo 'wait for sonar-scanner to finish'
+                 // calling plugin
+                 script {
+                    withSonarQubeEnv("${SONAR_SERVER_NAME}") {
+                
+                    bat """
+                    %SONAR_HOME%\\sonar-scanner \
+                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=${SONAR_HOST_URL} \ // jenkins internal env variable
+                    -Dsonar.token=${SONAR_TOKEN}
+                    """
+
+                    }
+                }
             }
+            // using plugins to call sonarENV
+            
+            
         }
      
     }

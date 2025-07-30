@@ -7,7 +7,7 @@ pipeline {
         BRANCH_NAME = 'master'
         SONAR_TOKEN  = credentials('DAS-SONARQUEBE-SECRETKEY')
         SONAR_PROJECT_KEY =  'DAS-SONARQUBE-JENKINFILES '
-        SONAR_SERVER_NAME = 'DAS-SONARQUEBE-SECRETKEY' // name we have configured under jenkins global confir
+        SONAR_SERVER_NAME = 'DAS-SONARQUBE' // name we have configured under jenkins global confir
     }
 
     stages {

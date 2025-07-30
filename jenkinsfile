@@ -23,27 +23,7 @@ pipeline {
             }
         }
         // git checkout 
-        stage('taking code of github repo'){
-            steps {
-                echo 'clone repo to project'
-                git url: "${REPO_NAME}", branch: "${BRANCH_NAME}"
-            }
-        }
-     //SONARQUEBE SCAN1
-     stage('SAST with sonar-scanner'){
-        steps {
-            echo 'wait for sonar-scanner to comoplete'
-            bat"""
-             %SONAR_HOME%\\sonar-scanner \
-        -Dsonar.projectKey=DAS-SONARQUBE-JENKINFILES \
-        -Dsonar.sources=. \
-        -Dsonar.host.url=http://13.203.151.240:9000 \
-        -Dsonar.token=sqp_ec80b788d40632989fd8cde86af67ffc039773d6
-        """
- 
-        }
         
-     }
 
     }
 }

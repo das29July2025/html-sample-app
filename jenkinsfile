@@ -9,7 +9,7 @@ pipeline {
         DOCKER_CREDS = 'das-dockercredential'
         SONAR_PROJECT_KEY =  'DAS-SONARQUBE-JENKINFILES '
         SONAR_SERVER_NAME = 'DAS-SONARQUBE' // name we have configured under jenkins global confir
-        IMAGE_NAME = 'daswebapp-iis-ltsc2022'
+        
     }
 
     stages {
@@ -77,28 +77,25 @@ pipeline {
             }
                 
             //Trivy scan
-            
+           stage('Trivy Scan') {
+    steps {
+        echo 'Running Trivy scan...'
+        bat '''
+        trivy image --severity HIGH,CRITICAL --format table -o report.txt imadasdockerhubjuly30/daswebapp-iis-ltsc2022:codev30
 
-        stage('Scan with Trivy') {
-            steps {
-                script {
-                    def result = bat(
-                        
-                        script: "trivy image --severity HIGH,CRITICAL --exit-code 1 --no-progress  ${IMAGE_NAME}",
-                        returnStatus: true
-                    )
+        findstr /I "HIGH CRITICAL" report.txt >nul
 
+        if %errorlevel% == 0 (
+            echo [ERROR] High or Critical vulnerabilities found.
+            exit /b 1
+        ) else (
+            echo No high or critical vulnerabilities found.
+        )
+        '''
+    }
+}
 
-                    if (result != 0) {
-                        error("Trivy scan failed: High or Critical vulnerabilities found.")
-                    } else {
-                        echo "Trivy scan passed: No high or critical vulnerabilities and continue with push operation."
-                    }
-                }
-            }
-        }
-
-    
+     
             
         }
       // pushing image  to dockerhub 

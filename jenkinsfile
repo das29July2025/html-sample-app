@@ -98,7 +98,7 @@ pipeline {
 
      
             
-        }
+        
       // pushing image  to dockerhub 
         stage('Docker hub image push'){
             steps{

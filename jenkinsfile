@@ -10,7 +10,7 @@ pipeline {
         SONAR_PROJECT_KEY = 'DAS-SONARQUBE-JENKINFILES'
         SONAR_SERVER_NAME = 'DAS-SONARQUBE'
         SONAR_HOST_URL = 'http://your-sonarqube-server-url' // Replace with actual SonarQube URL
-        IMAGE_NAME  = "dockerhubjuly30/daswebapp-iis-ltsc2022"
+        IMAGE_NAME  = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
         IMAGE_TAG =  "codev30"
         TRIVY_REPORT = "trivy-das-report.txt"
     }
@@ -59,9 +59,9 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 script {
-                    def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
-                    def imageTag = "codev30"
-                    docker.build("${imageName}:${imageTag}", ".")
+                    //def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
+                    //def imageTag = "codev30"
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}", ".")
                 }
                 bat 'docker images | findstr daswebapp'
             }
@@ -80,11 +80,11 @@ pipeline {
             steps {
                 echo 'Pushing Docker image...'
                 script {
-                    def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
-                    def imageTag = "codev30"
+                    //def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
+                    //def imageTag = "codev30"
                     def hubCred = "${DOCKER_CREDS}"
                     docker.withRegistry('https://registry.hub.docker.com', hubCred) {
-                        docker.image("${imageName}:${imageTag}").push()
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
                     }
                 }
             }
@@ -113,7 +113,7 @@ pipeline {
             steps {
                 git url: "${REPO_NAME}", branch: "${BRANCH_NAME}"
                 echo 'using zap'//
-                sh 'docker run -t --rm  ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://172.31.44.127:1235'
+                sh 'docker run -t --rm  ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://172.31.44.127:1235 -I'
             }
 
         }

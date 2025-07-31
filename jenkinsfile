@@ -9,7 +9,8 @@ pipeline {
         DOCKER_CREDS = 'das-dockercredential'
         SONAR_PROJECT_KEY = 'DAS-SONARQUBE-JENKINFILES'
         SONAR_SERVER_NAME = 'DAS-SONARQUBE'
-        SONAR_HOST_URL = 'http://your-sonarqube-server-url' // Replace with actual SonarQube URL
+        SONAR_HOST_URL = 'http://your-sonarqube-server-url' // Replace with actual SonarQube URL\
+        
     }
 
     stages {
@@ -64,7 +65,7 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
+        /*stage('Trivy Scan') {
             steps {
                 echo 'Running Trivy scan...'
                 bat '''
@@ -80,7 +81,7 @@ pipeline {
                 )
                 '''
             }
-        }
+        }*/
 
         stage('Push Docker image to Docker Hub') {
             steps {

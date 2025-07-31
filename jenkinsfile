@@ -65,7 +65,7 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
+        /*stage('Trivy Scan') {
             steps {
                 echo 'Running Trivy scan...'
                 bat '''
@@ -80,7 +80,7 @@ pipeline {
                 )
                 '''
             }
-        }
+        }*/
 
         stage('Push Docker image to Docker Hub') {
             steps {

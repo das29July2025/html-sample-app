@@ -1,125 +1,99 @@
 pipeline {
-    agent any // selection of agents 
-    // defining environment variables 
+    agent any
+
     environment {
         SONAR_HOME = 'C:\\Users\\Administrator\\Documents\\tools\\Sonarscanner\\bin'
         REPO_NAME  = 'https://github.com/das29July2025/html-sample-app.git'
         BRANCH_NAME = 'master'
         SONAR_TOKEN  = credentials('DAS-SONARQUEBE-SECRETKEY')
         DOCKER_CREDS = 'das-dockercredential'
-        SONAR_PROJECT_KEY =  'DAS-SONARQUBE-JENKINFILES '
-        SONAR_SERVER_NAME = 'DAS-SONARQUBE' // name we have configured under jenkins global confir
-        
+        SONAR_PROJECT_KEY = 'DAS-SONARQUBE-JENKINFILES'
+        SONAR_SERVER_NAME = 'DAS-SONARQUBE'
+        SONAR_HOST_URL = 'http://your-sonarqube-server-url' // Replace with actual SonarQube URL
     }
 
     stages {
-        // stage1
-        stage('testing and verify of required  commands') {
+        stage('Testing and verifying required commands') {
             steps {
                 echo 'Hello World'
-                 // bat or pwsh
                 bat """
                 %SONAR_HOME%\\sonar-scanner --version
-                echo == checking docker ===>
-                docker version 
-                echo ==> java version ==>
-                java --version 
-                echo == checking git version ==
+                echo == Checking Docker ==
+                docker version
+                echo ==> Java version ==>
+                java --version
+                echo == Checking Git version ==
                 git version
                 """
             }
         }
-        // git checkout 
-        stage('taking code of github repo'){
+
+        stage('Clone GitHub repository') {
             steps {
-                echo 'clone repo to project'
+                echo 'Cloning repository...'
                 git url: "${REPO_NAME}", branch: "${BRANCH_NAME}"
             }
         }
-        // doing sast with sonar-qube 
-        stage('SAST with sonar-scanner'){
-            steps {
-                 echo 'wait for sonar-scanner to finish'
-                 // calling plugin
-                 script {
-                    withSonarQubeEnv("${SONAR_SERVER_NAME}") {
-                
-                    bat """
-                    %SONAR_HOME%\\sonar-scanner \
-                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=${SONAR_HOST_URL} \
-                    -Dsonar.token=${SONAR_TOKEN}
-                    """
 
+        stage('SAST with SonarScanner') {
+            steps {
+                echo 'Running SonarScanner...'
+                script {
+                    withSonarQubeEnv("${SONAR_SERVER_NAME}") {
+                        bat """
+                        %SONAR_HOME%\\sonar-scanner ^
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} ^
+                        -Dsonar.sources=. ^
+                        -Dsonar.host.url=${SONAR_HOST_URL} ^
+                        -Dsonar.token=${SONAR_TOKEN}
+                        """
                     }
                 }
             }
-            // using plugins to call sonarENV
-            
-            
         }
-       
 
-      // using docker plugin to build container image 
-        stage('building docker image'){
+        stage('Build Docker image') {
             steps {
-                echo 'starting docker build process'
-                // to use docker plugin using script 
+                echo 'Building Docker image...'
                 script {
-                    def imageName  = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
-                    def imageTag   = "codev30"
-                    docker.build("${imageName}:${imageTag}",".")
-
+                    def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
+                    def imageTag = "codev30"
+                    docker.build("${imageName}:${imageTag}", ".")
                 }
-                // verify image build 
-                bat 'docker images   | findstr daswebapp'
+                bat 'docker images | findstr daswebapp'
             }
         }
-                
-            //Trivy scan
-           stage('Trivy Scan') {
-    steps {
-        echo 'Running Trivy scan...'
-        bat '''
-        trivy image --severity HIGH,CRITICAL --format table -o report.txt imadasdockerhubjuly30/daswebapp-iis-ltsc2022:codev30
 
-        findstr /I "HIGH CRITICAL" report.txt >nul
+        stage('Trivy Scan') {
+            steps {
+                echo 'Running Trivy scan...'
+                bat '''
+                trivy image --severity HIGH,CRITICAL --format table -o report.txt dasdockerhubjuly30/daswebapp-iis-ltsc2022:codev30
 
-        if %errorlevel% == 0 (
-            echo [ERROR] High or Critical vulnerabilities found.
-            exit /b 1
-        ) else (
-            echo No high or critical vulnerabilities found.
-        )
-        '''
+                findstr /I "HIGH CRITICAL" report.txt >nul
+
+                if %errorlevel% == 0 (
+                    echo [ERROR] High or Critical vulnerabilities found.
+                    exit /b 1
+                ) else (
+                    echo No high or critical vulnerabilities found.
+                )
+                '''
+            }
+        }
+
+        stage('Push Docker image to Docker Hub') {
+            steps {
+                echo 'Pushing Docker image...'
+                script {
+                    def imageName = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
+                    def imageTag = "codev30"
+                    def hubCred = "${DOCKER_CREDS}"
+                    docker.withRegistry('https://registry.hub.docker.com', hubCred) {
+                        docker.image("${imageName}:${imageTag}").push()
+                    }
+                }
+            }
+        }
     }
 }
-
-     
-            
-        
-      // pushing image  to dockerhub 
-        stage('Docker hub image push'){
-            steps{
-                echo 'pushing image to docker hub'
-                script {
-                    def imageName  = "dasdockerhubjuly30/daswebapp-iis-ltsc2022"
-                    def imageTag   = "codev30"
-                    def hubCred   = "${DOCKER_CREDS}"
-                    // calling jenkins pluing docker pipeline to push
-                    docker.withRegistry('https://registry.hub.docker.com',hubCred){
-                        docker.image(imageName + ":" + imageTag).push()
-                        // 
-
-                    }
-
-                }
-            }
-        }
-     
-    }
-
-    
-
-    

@@ -65,12 +65,11 @@ pipeline {
             }
         }
 
-        /*stage('Trivy Scan') {
+        stage('Trivy Scan') {
             steps {
                 echo 'Running Trivy scan...'
                 bat '''
-                trivy image --severity HIGH,CRITICAL --format table -o report.txt dasdockerhubjuly30/daswebapp-iis-ltsc2022:codev30
-
+                trivy image --severity HIGH,CRITICAL --format table -o report.txt --skip-version-check dasdockerhubjuly30/daswebapp-iis-ltsc2022:codev30
                 findstr /I "HIGH CRITICAL" report.txt >nul
 
                 if %errorlevel% == 0 (
@@ -81,7 +80,7 @@ pipeline {
                 )
                 '''
             }
-        }*/
+        }
 
         stage('Push Docker image to Docker Hub') {
             steps {

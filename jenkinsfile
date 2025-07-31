@@ -75,6 +75,7 @@ pipeline {
                 // verify image build 
                 bat 'docker images   | findstr daswebapp'
             }
+        }
                 
             //Trivy scan
            stage('Trivy Scan') {

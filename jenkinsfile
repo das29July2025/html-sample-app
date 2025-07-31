@@ -101,7 +101,5 @@ pipeline {
                 """
             }
         }
-
-        // Implement DAST (optional future stage)
-    }
-}
+    } // <-- closes stages
+} // <-- closes pipeline
